@@ -374,103 +374,8 @@ namespace BarcodeLib
 
             this.Encoded_Value = "";
             this._Country_Assigning_Manufacturer_Code = "N/A";
-            
-            switch (this.Encoded_Type)
-            {
-                case TYPE.UCC12:
-                case TYPE.UPCA: //Encode_UPCA();
-                    ibarcode = new UPCA(Raw_Data);
-                    break;
-                case TYPE.UCC13:
-                case TYPE.EAN13: //Encode_EAN13();
-                    ibarcode = new EAN13(Raw_Data);
-                    break;
-                case TYPE.Interleaved2of5: //Encode_Interleaved2of5();
-                    ibarcode = new Interleaved2of5(Raw_Data);
-                    break;
-                case TYPE.Industrial2of5:
-                case TYPE.Standard2of5: //Encode_Standard2of5();
-                    ibarcode = new Standard2of5(Raw_Data);
-                    break;
-                case TYPE.LOGMARS:
-                case TYPE.CODE39: //Encode_Code39();
-                    ibarcode = new Code39(Raw_Data);
-                    break;
-                case TYPE.CODE39Extended:
-                    ibarcode = new Code39(Raw_Data, true);
-                    break;
-                case TYPE.CODE39_Mod43:
-                    ibarcode = new Code39(Raw_Data, false, true);
-                    break;
-                case TYPE.CODE39Extended_Mod43:
-                    ibarcode = new Code39(Raw_Data, true, true);
-                    break;
-                case TYPE.Codabar: //Encode_Codabar();
-                    ibarcode = new Codabar(Raw_Data);
-                    break;
-                case TYPE.PostNet: //Encode_PostNet();
-                    ibarcode = new Postnet(Raw_Data);
-                    break;
-                case TYPE.ISBN:
-                case TYPE.BOOKLAND: //Encode_ISBN_Bookland();
-                    ibarcode = new ISBN(Raw_Data);
-                    break;
-                case TYPE.JAN13: //Encode_JAN13();
-                    ibarcode = new JAN13(Raw_Data);
-                    break;
-                case TYPE.UPC_SUPPLEMENTAL_2DIGIT: //Encode_UPCSupplemental_2();
-                    ibarcode = new UPCSupplement2(Raw_Data);
-                    break;
-                case TYPE.MSI_Mod10:
-                case TYPE.MSI_2Mod10:
-                case TYPE.MSI_Mod11:
-                case TYPE.MSI_Mod11_Mod10:
-                case TYPE.Modified_Plessey: //Encode_MSI();
-                    ibarcode = new MSI(Raw_Data, Encoded_Type);
-                    break;
-                case TYPE.UPC_SUPPLEMENTAL_5DIGIT: //Encode_UPCSupplemental_5();
-                    ibarcode = new UPCSupplement5(Raw_Data);
-                    break;
-                case TYPE.UPCE: //Encode_UPCE();
-                    ibarcode = new UPCE(Raw_Data);
-                    break;
-                case TYPE.EAN8: //Encode_EAN8();
-                    ibarcode = new EAN8(Raw_Data);
-                    break;
-                case TYPE.USD8:
-                case TYPE.CODE11: //Encode_Code11();
-                    ibarcode = new Code11(Raw_Data);
-                    break;
-                case TYPE.CODE128: //Encode_Code128();
-                    ibarcode = new Code128(Raw_Data);
-                    break;
-                case TYPE.CODE128A:
-                    ibarcode = new Code128(Raw_Data, Code128.TYPES.A);
-                    break;
-                case TYPE.CODE128B:
-                    ibarcode = new Code128(Raw_Data, Code128.TYPES.B);
-                    break;
-                case TYPE.CODE128C:
-                    ibarcode = new Code128(Raw_Data, Code128.TYPES.C);
-                    break;
-                case TYPE.ITF14:
-                    ibarcode = new ITF14(Raw_Data);
-                    break;
-                case TYPE.CODE93:
-                    ibarcode = new Code93(Raw_Data);
-                    break;
-                case TYPE.TELEPEN:
-                    ibarcode = new Telepen(Raw_Data);
-                    break;
-                case TYPE.FIM:
-                    ibarcode = new FIM(Raw_Data);
-                    break;
-                case TYPE.PHARMACODE:
-                    ibarcode = new Pharmacode(Raw_Data);
-                    break;
 
-                default: throw new Exception("EENCODE-2: Unsupported encoding type specified.");
-            }//switch
+            ibarcode = GetBarcodeSymbology(this.Encoded_Type, Raw_Data);
 
             this.Encoded_Value = ibarcode.Encoded_Value;
             this.Raw_Data = ibarcode.RawData;
@@ -1116,6 +1021,117 @@ namespace BarcodeLib
                 XML = b.XML;
                 return i;
             }//using
+        }
+
+        /// <summary>
+        /// Generates a barcode pattern. The resulting string consists of '1' and '0' characters,
+        /// with a '1' indicating a black bar and a '0' indicating an empty space. Consecutive '1' or '0' characters indicate
+        /// a wider bar or space.
+        /// For Postnet barcodes, a '1' indicates a full-height bar and a '0' indicates a half-height bar.
+        /// </summary>
+        public static string GenerateBarcodePatternString(TYPE type, string data)
+        {
+            var barcodeSymbology = GetBarcodeSymbology(type, data);
+            return barcodeSymbology.Encoded_Value;
+        }
+
+        private static IBarcode GetBarcodeSymbology(TYPE type, string data)
+        {
+            switch (type)
+            {
+                case TYPE.UCC12:
+                case TYPE.UPCA:
+                    return new UPCA(data);
+
+                case TYPE.UCC13:
+                case TYPE.EAN13:
+                    return new EAN13(data);
+
+                case TYPE.Interleaved2of5:
+                    return new Interleaved2of5(data);
+
+                case TYPE.Industrial2of5:
+                case TYPE.Standard2of5:
+                    return new Standard2of5(data);
+
+                case TYPE.LOGMARS:
+                case TYPE.CODE39:
+                    return new Code39(data);
+
+                case TYPE.CODE39Extended:
+                    return new Code39(data, true);
+
+                case TYPE.CODE39_Mod43:
+                    return new Code39(data, false, true);
+
+                case TYPE.CODE39Extended_Mod43:
+                    return new Code39(data, true, true);
+
+                case TYPE.Codabar:
+                    return new Codabar(data);
+
+                case TYPE.PostNet:
+                    return new Postnet(data);
+
+                case TYPE.ISBN:
+                case TYPE.BOOKLAND:
+                    return new ISBN(data);
+
+                case TYPE.JAN13:
+                    return new JAN13(data);
+
+                case TYPE.UPC_SUPPLEMENTAL_2DIGIT:
+                    return new UPCSupplement2(data);
+
+                case TYPE.MSI_Mod10:
+                case TYPE.MSI_2Mod10:
+                case TYPE.MSI_Mod11:
+                case TYPE.MSI_Mod11_Mod10:
+                case TYPE.Modified_Plessey:
+                    return new MSI(data, type);
+
+                case TYPE.UPC_SUPPLEMENTAL_5DIGIT:
+                    return new UPCSupplement5(data);
+
+                case TYPE.UPCE:
+                    return new UPCE(data);
+
+                case TYPE.EAN8:
+                    return new EAN8(data);
+
+                case TYPE.USD8:
+                case TYPE.CODE11:
+                    return new Code11(data);
+
+                case TYPE.CODE128:
+                    return new Code128(data);
+
+                case TYPE.CODE128A:
+                    return new Code128(data, Code128.TYPES.A);
+
+                case TYPE.CODE128B:
+                    return new Code128(data, Code128.TYPES.B);
+
+                case TYPE.CODE128C:
+                    return new Code128(data, Code128.TYPES.C);
+
+                case TYPE.ITF14:
+                    return new ITF14(data);
+
+                case TYPE.CODE93:
+                    return new Code93(data);
+
+                case TYPE.TELEPEN:
+                    return new Telepen(data);
+
+                case TYPE.FIM:
+                    return new FIM(data);
+
+                case TYPE.PHARMACODE:
+                    return new Pharmacode(data);
+
+                default: throw new Exception("EENCODE-2: Unsupported encoding type specified.");
+            }
         }
 
         #endregion
